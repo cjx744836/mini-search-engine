@@ -2,8 +2,10 @@ const http = require('http');
 const https = require('https');
 const iconv = require('iconv-lite');
 const crypto = require('crypto');
+const {detectEncoding} = require('char-encoding-detector');
 let reqTIMEOUT = 3000;
 const resTIMEOUT = 5000;
+let rawData = Buffer.alloc(0);
 let options = {
     method: 'get',
     headers: {
@@ -11,6 +13,7 @@ let options = {
         'accept': 'text/html'
     }
 };
+let adapter, req;
 
 function isHttps(host) {
     return /https/.test(host);
@@ -19,9 +22,9 @@ function isHttps(host) {
 function get(options) {
     return new Promise((resolve, reject) => {
         let tid = 0;
-        let adapter = isHttps(options.cprotocol) ? https : http;
-        let rawData = Buffer.alloc(0);
-        let req = adapter.request(options, function(res) {
+        adapter = isHttps(options.cprotocol) ? https : http;
+        rawData = Buffer.alloc(0);
+        req = adapter.request(options, function(res) {
             clearTimeout(tid);
             let resId = 0;
             let code = res.statusCode;
@@ -48,6 +51,7 @@ function get(options) {
             } else {
                 resId = setTimeout(() => {
                     res.destroy();
+                    rawData = undefined;
                     reject(new Error('Response Timeout'));
                 }, resTIMEOUT);
                 let m;
@@ -57,6 +61,7 @@ function get(options) {
                 res.on('end', () => {
                     clearTimeout(resId);
                     resolve({data: rawData});
+                    rawData = undefined;
                 });
                 res.on('error', e => {
                     if(res.destroyed) return;
@@ -89,32 +94,19 @@ function decode(t) {
     })
 }
 
-function isNeedDecode(data) {
-    let m = data.match(/gb2312|gbk|big5|utf-8/i);
-    if(m) return m;
-    return 0;
-}
-
 process.on('message', args => {
     options.host = args.host;
     get(options).then(res => {
-        let m = isNeedDecode(res.data.toString());
-        if(m) {
-            res = {data: iconv.decode(res.data, m)};
-        } else {
-            res = {data: res.data.toString()};
-        }
         let title, ob = {};
-        if(res && typeof res.data === 'string') {
-            title = res.data.match(/<title>(.*)<\/title>/i);
-            if(title) {
-                if(/&#[^;]+;/.test(title[1])) {
-                    title[1] = decode(title[1]);
-                }
-                ob.title = title[1];
-                ob.id = genId(args.host);
-                ob.host = args.host;
+        title = iconv.decode(res.data, detectEncoding(res.data) || 'gb2312');
+        title = title.match(/<title>(.*)<\/title>/i);
+        if(title) {
+            if(/&#[^;]+;/.test(title[1])) {
+                title[1] = decode(title[1]);
             }
+            ob.title = title[1];
+            ob.id = genId(args.host);
+            ob.host = args.host;
         }
         process.send(ob);
     }).catch(err => {

@@ -8,7 +8,7 @@
             </div>
             <div class="search-item" v-for="(k,i) in list">
                 <div class="search-item-name">
-                    <a :href="'http://'+k.host" target="_blank" rel="noopener">{{i+1}} {{k.title}}</a>
+                    <a :href="'http://'+k.host" target="_blank" rel="noopener" v-html="(i+1)+' ' +k.title"></a>
                 </div>
                 <div>{{formatTime(k.create_time)}}</div>
             </div>

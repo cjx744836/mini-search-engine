@@ -15,10 +15,14 @@ function connect() {
     });
 }
 connect();
-function query(sql, callback) {
-    connection.query(sql, (err, results) => {
-        typeof callback === 'function' && callback(err, results);
-    })
+function query(sql) {
+    return new Promise((resolve, reject) => {
+        connection.query(sql, (err, results) => {
+            err ? reject(err) : resolve(results);
+        })
+    }).catch(err => {
+        return {errCode: 'sql error'};
+    });
 }
 
 module.exports = query;

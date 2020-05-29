@@ -1,0 +1,22 @@
+<div id="app">
+    <div class="search-list">
+        <div v-if="list.length===0">无结果</div>
+        <div v-else>
+            <div class="search-item bold">
+                <div class="search-select"><a href="javascript:void(0);" @click="delBantch">批量删除</a></div>
+                <div class="search-item-name">标题</div>
+                <div>操作</div>
+            </div>
+            <div class="search-item" v-for="(k,i) in list" :key="k.id">
+                <div class="search-select"><input type="checkbox" :checked="sels[k.id]" @click="addSel(k.id, $event)"></div>
+                <div class="search-item-name">
+                    <a :href="'http://'+k.host" target="_blank" v-html="k.title" rel="noopener"></a>
+                </div>
+                <div>
+                    <a href="javascript:void(0)" @click="del(k.id)">删除</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <pager :total="total" :page.sync="page" :page-size="40" @page-change="getList" layout="prev,pager,next,total"></pager>
+</div>

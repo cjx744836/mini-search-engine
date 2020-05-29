@@ -30,5 +30,16 @@ module.exports = {
   },
     getFile(dir) {
     return fs.readFileSync(path.resolve(__dirname, dir), 'utf-8');
+    },
+    genPageParam(key, page, size) {
+        let value = decodeURIComponent(key);
+        key = value.split(' ').filter(d => d.length).map(d => `title like '%${d}%'`).join(' or ');
+        page = isNaN(page) ? 1 : (Number(page) || 1);
+        return {
+            start: (page - 1) * size,
+            page: page,
+            key: key,
+            value: value
+        }
     }
 };

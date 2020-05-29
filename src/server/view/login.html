@@ -1,0 +1,14 @@
+<div id="app">
+    <div class="logo"></div>
+    <div class="login">
+        <div class="login-item">
+            <span>用户名</span><input type="text" v-model="formData.name" @keyup.enter="submit">
+        </div>
+        <div class="login-item">
+            <span>密&nbsp;&nbsp;&nbsp;码</span><input type="password" v-model="formData.pwd" @keyup.enter="submit">
+        </div>
+        <div class="login-item">
+            <div class="login-btn" @click="submit">提交</div>
+        </div>
+    </div>
+</div>

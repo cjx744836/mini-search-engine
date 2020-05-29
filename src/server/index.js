@@ -1,49 +1,90 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-const query = require('./sql');
 const router = require('./router');
+const controller = require('./controller');
+const APP = 'mini-search-engine';
+const utils = require('./utils');
+const cookieParser = require('cookie-parser');
+const bodyPraser = require('body-parser');
+const Token = require('./token');
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
+app.use(bodyPraser.json());
+app.use((req, res, next) => {
+   res.set('content-type', 'text/html;charset=utf-8');
+   if(Token.checkToken(req.cookies.token)) {
+       res.cookie('token', req.cookies.token, {maxAge: 60 * 60 * 1000});
+   }
+   next();
+});
+
 app.get('/', (req, res) => {
-    router.index(req, res, {
-        title: 'mini-search-engine'
-    });
+    router.index(req, res, {title: APP});
 });
 
-app.get('/search', (req, res) => {
-    if(req.query.key) {
-        req.query.key = decodeURIComponent(req.query.key);
-        let key = req.query.key.split(' ').filter(d => d.length).map(d => `title like '%${d}%'`).join(' or ');
-        let page = isNaN(req.query.page) ? 1 : (Number(req.query.page) || 1);
-        let size = 20;
-        let start = (page - 1) * size;
-        let sql = `select sql_calc_found_rows * from s_title where ${key} order by create_time desc limit ${start},${size}`;
-        let options = {data: {}};
-        query(sql, (err, results) => {
-            if(err) return res.redirect('/');
-            options.data.list = results;
-            query(`select found_rows() total`, (err, results) => {
-               if(err) return res.redirect('/');
-               if(!results[0].total && page > 1) return res.redirect(`/search?key=${req.query.key}`);
-               options.data.total = results[0].total;
-               options.data.page = page;
-               options.data.value = req.query.key;
-               options.title = req.query.key + ' - mini-search-engine';
-               router.search(req, res, options);
-            });
-        });
-    } else {
-        res.redirect('/');
-    }
+app.get('/search', async (req, res) => {
+    if(!req.query.key) return res.redirect('/');
+    let size = 20;
+    let pageParam = utils.genPageParam(req.query.key, req.query.page, size);
+    let data = await controller.search(pageParam.key, pageParam.start, size);
+    if(!data) return res.redirect('/');
+    if(!data.total && pageParam.page > 1) return res.redirect(`/search?key=${pageParam.value}`);
+    let options = {
+        data: {
+            list: data.list,
+            total: data.total,
+            page: pageParam.page,
+            value: pageParam.value
+        },
+        title: `${pageParam.value} - ${APP}`
+    };
+    router.search(req, res, options);
 });
 
-app.get('/latest', (req, res) => {
-   let sql = `select * from s_title order by create_time desc limit 0, 100`;
-   query(sql, (err, results) => {
-       if(err) return res.redirect('/');
-       router.latest(req, res, {title: '最新100 - mini-search-engine', data: {list: results}});
-   })
+app.get('/latest', async (req, res) => {
+    let data = await controller.latest();
+    if(!data) return res.redirect('/');
+    router.latest(req, res, {title: `最新100 - ${APP}`, data: {list: data.list}});
+});
+
+app.get('/login', (req, res) => {
+   if(Token.checkToken(req.cookies.token)) return res.redirect('/manager');
+   router.login(req, res, {title: `登录 - ${APP}`});
+});
+
+app.get('/manager', (req, res) => {
+    if(!Token.checkToken(req.cookies.token)) return res.redirect('/login');
+    router.manager(req, res, {title: `管理 - ${APP}`});
+});
+
+app.post('/del', async (req, res) => {
+    if(!Token.checkToken(req.cookies.token) || !req.body.id) return res.send({code: 1002, err: '非法操作'});
+    let data = await controller.del(req.body.id);
+    if(!data) return res.send({code: 1002, err: '删除失败'});
+    res.send({code: 0});
+});
+
+app.post('/submit', async (req, res) => {
+   if(req.body.name && req.body.pwd) {
+       let data = await controller.getUser(req.body.name);
+       if(!data) return res.send({code: 1000, err: '用户不存在'});
+       if(Token.genPwd(req.body.pwd) !== data.pwd) return res.send({code: 1000, err: '密码错误'});
+       res.cookie('token', Token.genToken(req.body.name), {maxAge: 60 * 60 * 1000});
+       res.send({code: 0});
+   } else {
+       res.send({code: 1000, err: '参数错误'});
+   }
+});
+
+app.post('/list', async (req, res) => {
+    if(!Token.checkToken(req.cookies.token)) return res.send({code: 1001, err: '未登录'});
+    let size = 20;
+    let pageParam = utils.genPageParam('', req.body.page, size);
+    let data = await controller.list(pageParam.start, size);
+    if(!data) return res.send({code: 1001, err: '数据获取失败'});
+    res.send({code: 0, total: data.total, list: data.list});
 });
 
 app.get('*', (req, res) => {

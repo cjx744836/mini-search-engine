@@ -24,6 +24,36 @@ function index(req, res, context) {
     });
 }
 
+function manager(req, res, options) {
+    let html = utils.getFile('./view/manager.html');
+    let js = `
+            ${html}
+            <script src="/js/vue.min.js" type="text/javascript"></script>
+            <script src="/js/axios.min.js" type="text/javascript"></script>
+            <script src="/js/manager.js" type="text/javascript"></script>
+            `;
+    let app = createApp({template: '<div></div>'})
+    renderer.renderToString(app, {title: options.title, js: js}, (err, html) => {
+        if(err) return res.redirect('/');
+        res.end(html);
+    })
+}
+
+function login(req, res, options) {
+    let html = utils.getFile('./view/login.html');
+    let js = `
+            ${html}
+            <script src="/js/vue.min.js" type="text/javascript"></script>
+            <script src="/js/axios.min.js" type="text/javascript"></script>
+            <script src="/js/login.js" type="text/javascript"></script>
+            `;
+    let app = createApp({template: '<div></div>'})
+    renderer.renderToString(app, {title: options.title, js: js}, (err, html) => {
+        if(err) return res.redirect('/');
+        res.end(html);
+    })
+}
+
 function latest(req, res, options) {
     options = Object.assign(options, {
         template: utils.getFile('./view/latest.html'),
@@ -130,5 +160,7 @@ function search(req, res, options) {
 module.exports = {
     search,
     index,
-    latest
+    latest,
+    login,
+    manager
 };

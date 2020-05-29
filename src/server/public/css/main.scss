@@ -72,6 +72,9 @@ html, body {
       width: 80px;
       flex-shrink: 0;
     }
+    .search-select {
+      width: 100px;
+    }
     &:hover {
       background: #eee;
     }
@@ -220,6 +223,75 @@ html, body {
   }
 }
 
+.login {
+  width: 405px;
+  margin: auto;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  box-shadow: 0 0 5px #eee;
+  text-align: left;
+  padding: 10px;
+  .login-btn {
+    display: inline-block;
+    padding: 5px 10px;
+    background: #007bff;
+    color: #fff;
+    cursor: pointer;
+  }
+  .login-item {
+    padding: 5px;
+    & > span {
+      display: inline-block;
+      width: 130px;
+      margin-right: 10px;
+      text-align: right;
+    }
+    input {
+      border-radius: 3px;
+      border: 1px solid #eee;
+      padding: 5px;
+    }
+    &:last-child {
+      text-align: center;
+    }
+  }
+}
+
+.page-container {
+  text-align: center;
+  margin-bottom: 30px;
+  span {
+    border: 1px solid #eee;
+    display: inline-block;
+    min-width: 30px;
+    height: 30px;
+    line-height: 30px;
+    color: #666;
+    cursor: pointer;
+    margin: 0 2px;
+  }
+  span:hover, span.active {
+    background: #409eff;
+    color: #fff;
+  }
+  span.disabled {
+    background: #fff;
+    color: #aaa;
+    cursor: not-allowed;
+  }
+  span.normal {
+    border: 0;
+  }
+  span.normal:hover {
+    background: inherit;
+    color: inherit;
+  }
+  .number {
+    width: 30px;
+    cursor: pointer;
+    text-align: center;
+  }
+}
 
 @media screen and (max-width:375px){
   #app {
