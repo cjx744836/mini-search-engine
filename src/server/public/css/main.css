@@ -1,0 +1,235 @@
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-size: 14px;
+  color: #666;
+}
+
+#app {
+  text-align: center;
+}
+#app .search {
+  width: 60%;
+  margin: auto;
+  transition-duration: 0.3s;
+}
+#app .search .search-input {
+  font-size: 0;
+  display: flex;
+}
+#app .search .search-input input {
+  flex: 1 1 auto;
+  border-radius: 5px;
+  font-size: 16px;
+  border: 1px solid #666666;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 0 0 5px;
+  box-sizing: border-box;
+  border-right: 0;
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  vertical-align: middle;
+  outline: 0;
+}
+#app .search .search-input input:focus {
+  box-shadow: 0 0 5px 0 #007bff;
+  position: relative;
+  border-color: #007bff;
+}
+#app .search .search-input button {
+  flex-shrink: 0;
+  height: 40px;
+  line-height: 40px;
+  border: 1px solid #666;
+  width: 100px;
+  box-sizing: border-box;
+  vertical-align: middle;
+  border-top-right-radius: 5px;
+  font-size: 16px;
+  border-bottom-right-radius: 5px;
+  background: #fff;
+}
+
+.search-list {
+  width: 80%;
+  margin: 30px auto;
+}
+.search-list .search-item:first-child {
+  border-top: none;
+}
+.search-list .search-item:first-child:hover {
+  background: inherit;
+}
+.search-list .search-item {
+  width: 100%;
+  display: flex;
+  text-align: left;
+  border-top: 1px solid #eee;
+  padding: 8px 0;
+  word-break: break-word;
+}
+.search-list .search-item.bold {
+  font-weight: bold;
+}
+.search-list .search-item .search-item-link {
+  width: 80px;
+  flex-shrink: 0;
+}
+.search-list .search-item:hover {
+  background: #eee;
+}
+.search-list .search-item i {
+  background: #696565;
+  color: #eee;
+  border-radius: 5px;
+  font-style: normal;
+  padding: 2px;
+  font-size: 12px;
+}
+.search-list .search-item a {
+  text-decoration: none;
+}
+.search-list .search-item a:link {
+  color: #007bff;
+}
+.search-list .search-item a:hover {
+  color: #ff6259;
+}
+.search-list .search-item a:visited {
+  color: #696565;
+}
+.search-list .search-item div {
+  font-size: 15px;
+  width: 100%;
+}
+.search-list .search-item div:last-child {
+  width: 200px;
+  flex-shrink: 0;
+  color: #666;
+  text-align: right;
+}
+.search-list .search-item span {
+  color: #ff6259;
+}
+
+.detail {
+  width: 80%;
+  margin: 30px auto;
+}
+
+.detail-item {
+  display: flex;
+  width: 100%;
+  border-top: 1px solid #eee;
+  padding: 8px 0;
+  font-size: 15px;
+}
+.detail-item:hover {
+  background: #eee;
+}
+.detail-item div {
+  text-align: left;
+  width: 100%;
+}
+.detail-item div:last-child {
+  text-align: right;
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.detail-info {
+  text-align: left;
+  font-size: 16px;
+  padding: 15px;
+  border: 1px solid #eee;
+  margin-top: -1px;
+  display: flex;
+  align-items: baseline;
+}
+.detail-info div {
+  flex: 1 1 auto;
+}
+.detail-info div:first-child {
+  display: inline-block;
+  width: 200px;
+  text-align: right;
+  font-weight: bold;
+  font-size: 14px;
+  margin-right: 10px;
+  flex: 0 0 auto;
+}
+.detail-info a {
+  color: #496aa7;
+}
+
+.detail-list-title {
+  margin: 15px 0;
+  text-align: left;
+  font-weight: bold;
+}
+
+.logo {
+  background: url(/img/timg.jpg) center center;
+  width: 200px;
+  height: 200px;
+  margin: 100px auto 30px auto;
+  background-size: cover;
+}
+
+.page {
+  font-size: 0;
+  margin-bottom: 30px;
+}
+.page span {
+  display: inline-block;
+  min-width: 30px;
+  height: 30px;
+  background: #fff;
+  line-height: 30px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  margin: 0 3px;
+}
+.page span a {
+  color: #666666;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+.page span a:hover {
+  color: #fff;
+  background: #696565;
+}
+.page span.active {
+  background: #696565;
+  color: #fff;
+}
+.page span.disabled {
+  cursor: not-allowed;
+}
+.page label {
+  font-size: 14px;
+  margin-left: 15px;
+}
+
+.top {
+  color: #333;
+  text-align: left;
+  margin: 10px auto auto auto;
+}
+.top a {
+  color: #333;
+  text-decoration: none;
+}
+.top a:hover {
+  color: #ff6259;
+}
+
+@media screen and (max-width: 375px) {
+  #app .search {
+    width: 90%;
+  }
+}
