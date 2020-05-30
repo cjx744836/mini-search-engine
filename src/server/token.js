@@ -4,8 +4,24 @@ function genToken() {
     return crypto.createHash('sha1').update(`${Date.now()}:${Math.random() * 1000}`).digest().toString('hex');
 }
 
+function removeToken() {
+    let t = Date.now();
+    for(let token in Token.tokens) {
+        if(t - Token.tokens[token].timestamp > 60 * 60 * 1000) {
+            delete Token.tokens[token];
+        }
+    }
+    for(let it in Token.forceMap) {
+        if(t - Token.forceMap[it] > 60 * 60 * 1000) {
+            delete Token.forceMap[it];
+        }
+    }
+    setTimeout(() => removeToken(), 60 * 60 * 1000);
+}
+
 class Token {
     static tokens = {};
+    static forceMap = {};
     static genToken(t) {
         let token = genToken();
         Token.tokens[token] = {
@@ -13,6 +29,36 @@ class Token {
             timestamp: Date.now()
         };
         return token;
+    }
+    static hadForceToken(token) {
+        if(Token.forceMap[token]) {
+            delete Token.forceMap[token];
+            return true;
+        }
+        return false;
+    }
+    static updateByUserName(userName) {
+        let token = Token.getTokenByUserName(userName);
+        if(token) {
+            Token.forceMap[token] = Date.now();
+            delete Token.tokens[token];
+        }
+    }
+    static hadUserName(userName) {
+        for(let it in Token.tokens) {
+            if(Token.tokens[it].userName === userName) {
+                return true;
+            }
+        }
+        return false;
+    }
+    static getTokenByUserName(userName) {
+        for(let it in Token.tokens) {
+            if(Token.tokens[it].userName === userName) {
+                return it;
+            }
+        }
+        return false;
     }
     static needChange(token) {
         let o = Token.tokens[token];
@@ -48,5 +94,7 @@ class Token {
         return Token.tokens[token].userName;
     }
 }
+
+removeToken();
 
 module.exports = Token;

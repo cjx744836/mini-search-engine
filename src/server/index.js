@@ -18,6 +18,10 @@ app.use((req, res, next) => {
        let tk = Token.changeToken(req.cookies.token);
        tk && res.cookie('token', tk, {maxAge: 60 * 60 * 1000});
    }
+   if(Token.hadForceToken(req.cookies.token)) {
+       return res.status(500).send({code: 5000, err: '你的账户在其它地方登录'});
+   }
+   console.log(req.cookies.token);
    next();
 });
 
@@ -61,26 +65,29 @@ app.get('/manager', (req, res) => {
 });
 
 app.post('/del', async (req, res) => {
-    if(!Token.checkToken(req.cookies.token) || !req.body.id) return res.send({code: 1002, err: '非法操作'});
+    if(!Token.checkToken(req.cookies.token) || !req.body.id) return res.status(500).send({code: 1002, err: '非法操作'});
     let data = await controller.del(req.body.id);
-    if(!data) return res.send({code: 1002, err: '删除失败'});
+    if(!data) return res.status(500).send({code: 1002, err: '删除失败'});
     res.send({code: 0});
 });
 
 app.post('/submit', async (req, res) => {
    if(req.body.name && req.body.pwd) {
        let data = await controller.getUser(req.body.name);
-       if(!data) return res.send({code: 1000, err: '用户不存在'});
-       if(Token.genPwd(req.body.pwd) !== data.pwd) return res.send({code: 1000, err: '密码错误'});
+       if(!data) return res.status(500).send({code: 1000, err: '用户不存在'});
+       if(Token.genPwd(req.body.pwd) !== data.pwd) return res.status(500).send({code: 1000, err: '密码错误'});
+       if(Token.hadUserName(req.body.name)) {
+           Token.updateByUserName(req.body.name);
+       }
        res.cookie('token', Token.genToken(req.body.name), {maxAge: 60 * 60 * 1000});
        res.send({code: 0});
    } else {
-       res.send({code: 1000, err: '参数错误'});
+       res.status(500).send({code: 1000, err: '参数错误'});
    }
 });
 
 app.post('/list', async (req, res) => {
-    if(!Token.checkToken(req.cookies.token)) return res.send({code: 1001, err: '未登录'});
+    if(!Token.checkToken(req.cookies.token)) return res.status(500).send({code: 1001, err: '未登录'});
     let size = 20;
     let pageParam = utils.genPageParam(req.body.key, req.body.page, size);
     let data;
@@ -89,7 +96,7 @@ app.post('/list', async (req, res) => {
     } else {
         data = await controller.list(pageParam.start, size);
     }
-    if(!data) return res.send({code: 1001, err: '数据获取失败'});
+    if(!data) return res.status(500).send({code: 1001, err: '数据获取失败'});
     res.send({code: 0, total: data.total, list: data.list});
 });
 

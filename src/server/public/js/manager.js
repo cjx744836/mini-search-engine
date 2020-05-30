@@ -1,6 +1,5 @@
 import Vue from 'vue/dist/vue.esm.js';
-import axios from 'axios';
-
+import request from './request';
 (function() {
     let dlg = Vue.extend({
         template: '<div style="position:fixed;top:10px;left:50%;background:#c00;color:#fff;padding:10px 20px;border-radius:3px;">{{msg}}</div>',
@@ -213,13 +212,13 @@ import axios from 'axios';
             delBantch() {
                 if(this.getSels().length === 0) return alert('请先选择');
                 if(confirm('确定删除')) {
-                    axios.post('/del', {id: this.getSels().join()}).then(res => {
-                        if(!res.data.code) {
-                            this.sels = {};
-                            this.getList();
-                            message('删除成功')
-                        }
-                    })
+                    request('/del', 'post', {id: this.getSels().join()}).then(res => {
+                        this.sels = {};
+                        this.getList();
+                        message('删除成功')
+                    }).catch(err => {
+                        message(err.message);
+                    });
                 }
             },
             selectAll() {
@@ -236,13 +235,13 @@ import axios from 'axios';
             },
             del(id) {
                 if(confirm('确定删除')) {
-                    axios.post('/del', {id}).then(res => {
-                        if(!res.data.code) {
-                            delete this.sels[id];
-                            this.getList();
-                            message('删除成功')
-                        }
-                    })
+                    request('/del', 'post', {id}).then(res => {
+                        delete this.sels[id];
+                        this.getList();
+                        message('删除成功')
+                    }).catch(err => {
+                        message(err.message);
+                    });
                 }
             },
             search() {
@@ -259,12 +258,12 @@ import axios from 'axios';
                 this.getList();
             },
             getList() {
-                axios.post('/list', {page: this.page, key: this.key.trim()}).then(res => {
-                    if(res.data.list) {
-                        this.list = res.data.list;
-                        this.total = res.data.total;
-                    }
-                })
+                request('/list', 'post', {page: this.page, key: this.key.trim()}).then(res => {
+                    this.list = res.list;
+                    this.total = res.total;
+                }).catch(err => {
+                    message(err.message);
+                });
             }
         },
         updated() {
