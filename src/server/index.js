@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-const router = require('./router');
+const router = require('./router.build');
 const controller = require('./controller');
 const APP = 'mini-search-engine';
 const utils = require('./utils');
@@ -14,8 +14,9 @@ app.use(cookieParser());
 app.use(bodyPraser.json());
 app.use((req, res, next) => {
    res.set('content-type', 'text/html;charset=utf-8');
-   if(Token.checkToken(req.cookies.token)) {
-       res.cookie('token', req.cookies.token, {maxAge: 60 * 60 * 1000});
+   if(req.cookies.token && Token.needChange(req.cookies.token)) {
+       let tk = Token.changeToken(req.cookies.token);
+       tk && res.cookie('token', tk, {maxAge: 60 * 60 * 1000});
    }
    next();
 });
@@ -81,8 +82,13 @@ app.post('/submit', async (req, res) => {
 app.post('/list', async (req, res) => {
     if(!Token.checkToken(req.cookies.token)) return res.send({code: 1001, err: '未登录'});
     let size = 20;
-    let pageParam = utils.genPageParam('', req.body.page, size);
-    let data = await controller.list(pageParam.start, size);
+    let pageParam = utils.genPageParam(req.body.key, req.body.page, size);
+    let data;
+    if(req.body.key) {
+        data = await controller.search(pageParam.key, pageParam.start, size);
+    } else {
+        data = await controller.list(pageParam.start, size);
+    }
     if(!data) return res.send({code: 1001, err: '数据获取失败'});
     res.send({code: 0, total: data.total, list: data.list});
 });

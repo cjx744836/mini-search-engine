@@ -1,3 +1,6 @@
+import Vue from 'vue/dist/vue.esm.js';
+import axios from 'axios';
+
 (function() {
     let dlg = Vue.extend({
         template: '<div style="position:fixed;top:10px;left:50%;background:#c00;color:#fff;padding:10px 20px;border-radius:3px;">{{msg}}</div>',
@@ -193,8 +196,11 @@
             list: [],
             sels: {},
             page: 1,
+            key: '',
+            reg: '',
             last: 0,
-            total: 0
+            total: 0,
+            m_select_all: false,
         },
         methods: {
             getSels() {
@@ -216,6 +222,18 @@
                     })
                 }
             },
+            selectAll() {
+                this.m_select_all = !this.m_select_all;
+                if(this.m_select_all) {
+                    this.list.map(d => this.$set(this.sels, d.id, 1));
+                } else {
+                    this.list.map(d => this.$delete(this.sels, d.id));
+                }
+            },
+            filterKeyword(k) {
+                if(this.reg) return k.replace(this.reg, '<span>$1</span>');
+                return k;
+            },
             del(id) {
                 if(confirm('确定删除')) {
                     axios.post('/del', {id}).then(res => {
@@ -227,14 +245,30 @@
                     })
                 }
             },
+            search() {
+                let key = this.key.trim();
+                if(key.length) {
+                    key = key.split(' ').filter(d => d.length).map(d => d.replace(/([\*\?\|\+\[\]\{\}\(\)\^\$\&\#\\\/\.])/,'\\$1')).join('|');
+                    this.reg = new RegExp(`(${key})`, 'gi');
+                } else {
+                    this.reg = '';
+                }
+                this.sels = {};
+                this.m_select_all = false;
+                this.page = 1;
+                this.getList();
+            },
             getList() {
-                axios.post('/list', {page: this.page}).then(res => {
+                axios.post('/list', {page: this.page, key: this.key.trim()}).then(res => {
                     if(res.data.list) {
                         this.list = res.data.list;
                         this.total = res.data.total;
                     }
                 })
             }
+        },
+        updated() {
+            this.m_select_all = this.list.every(d => this.sels[d.id]);
         },
         created() {
             this.getList();

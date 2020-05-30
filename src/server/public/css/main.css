@@ -77,7 +77,8 @@ html, body {
   flex-shrink: 0;
 }
 .search-list .search-item .search-select {
-  width: 100px;
+  width: 75px;
+  flex-shrink: 0;
 }
 .search-list .search-item:hover {
   background: #eee;
@@ -263,6 +264,23 @@ html, body {
 }
 .login .login-item:last-child {
   text-align: center;
+}
+
+.manager-search {
+  width: 80%;
+  margin: 30px auto -20px auto;
+  text-align: left;
+}
+.manager-search input {
+  border-radius: 5px;
+  padding: 5px;
+  width: 300px;
+  margin-left: 10px;
+  border: 1px solid #eee;
+}
+.manager-search input:focus {
+  outline: 0;
+  border-color: #007bff;
 }
 
 .page-container {

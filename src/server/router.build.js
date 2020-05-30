@@ -18,7 +18,7 @@ function index(req, res, context) {
             }
         }
     });
-    context.js = '<script src="{{{index}}}" type="text/javascript"></script>'
+    context.js = '<script src="/js/index.build.js" type="text/javascript"></script>'
     renderer.renderToString(app, context, (err, html) => {
         res.end(html);
     });
@@ -28,8 +28,8 @@ function manager(req, res, options) {
     let html = utils.getFile('./view/manager.html');
     let js = `
             ${html}
-            <script src="{{{vendor}}}" type="text/javascript"></script>
-            <script src="{{{manager}}}" type="text/javascript"></script>
+            <script src="/js/vendor.build.js" type="text/javascript"></script>
+            <script src="/js/manager.build.js" type="text/javascript"></script>
             `;
     let app = createApp({template: '<div></div>'})
     renderer.renderToString(app, {title: options.title, js: js}, (err, html) => {
@@ -42,8 +42,8 @@ function login(req, res, options) {
     let html = utils.getFile('./view/login.html');
     let js = `
             ${html}
-            <script src="{{{vendor}}}" type="text/javascript"></script>
-            <script src="{{{login}}}" type="text/javascript"></script>
+            <script src="/js/vendor.build.js" type="text/javascript"></script>
+            <script src="/js/login.build.js" type="text/javascript"></script>
             `;
     let app = createApp({template: '<div></div>'})
     renderer.renderToString(app, {title: options.title, js: js}, (err, html) => {
@@ -149,7 +149,7 @@ function search(req, res, options) {
     let context = {};
     context.title = options.title;
     let app = createApp(defs);
-    context.js = '<script src="{{{index}}}" type="text/javascript"></script>'
+    context.js = '<script src="/js/index.build.js" type="text/javascript"></script>'
     renderer.renderToString(app, context, (err, html) => {
         res.end(html);
     });

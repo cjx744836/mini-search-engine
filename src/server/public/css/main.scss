@@ -73,7 +73,8 @@ html, body {
       flex-shrink: 0;
     }
     .search-select {
-      width: 100px;
+      width: 75px;
+      flex-shrink: 0;
     }
     &:hover {
       background: #eee;
@@ -256,7 +257,22 @@ html, body {
     }
   }
 }
-
+.manager-search {
+  width: 80%;
+  margin: 30px auto -20px auto;
+  text-align: left;
+  input {
+    border-radius: 5px;
+    padding: 5px;
+    width: 300px;
+    margin-left: 10px;
+    border: 1px solid #eee;
+    &:focus {
+      outline: 0;
+      border-color: #007bff;
+    }
+  }
+}
 .page-container {
   text-align: center;
   margin-bottom: 30px;

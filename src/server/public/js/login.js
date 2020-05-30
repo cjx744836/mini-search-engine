@@ -1,3 +1,7 @@
+import Vue from 'vue/dist/vue.esm.js';
+import axios from 'axios';
+
+
 (function() {
     new Vue({
         el: '#app',
