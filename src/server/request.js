@@ -2,7 +2,6 @@ const http = require('http');
 const https = require('https');
 const iconv = require('iconv-lite');
 const crypto = require('crypto');
-const {detectEncoding} = require('char-encoding-detector');
 let reqTIMEOUT = 3000;
 const resTIMEOUT = 5000;
 let rawData = Buffer.alloc(0);
@@ -83,36 +82,14 @@ function get(options) {
     });
 }
 
-function genId(s) {
-    return crypto.createHash('sha1').update(s).digest().toString('hex');
-}
-
-function decode(t) {
-    return t.replace(/&#([^;]+);/g, function(a, b) {
-        if(/^x/.test(b)) {
-            return String.fromCharCode(0 + b);
-        }
-        return String.fromCharCode(b);
-    })
-}
-
-process.on('message', args => {
-    if(!args.host) return;
-    options.host = args.host;
-    get(options).then(res => {
-        let title, ob = {};
-        title = iconv.decode(res.data, detectEncoding(res.data) || 'gb2312');
-        title = title.match(/<title>(.*)<\/title>/i);
-        if(title) {
-            if(/&#[^;]+;/.test(title[1])) {
-                title[1] = decode(title[1]);
-            }
-            ob.title = title[1];
-            ob.id = genId(args.host);
-            ob.host = args.host;
-        }
-        process.send(ob);
+module.exports = function(host, encoding) {
+    options.host = host;
+    return get(options).then(res => {
+        data = iconv.decode(res.data, encoding);
+        let title = data.match(/<title>(.*)<\/title>/);
+        if(title) return title[1];
+        return false;
     }).catch(err => {
-        process.send({err: 1});
-    });
-});
+        return false;
+    })
+};

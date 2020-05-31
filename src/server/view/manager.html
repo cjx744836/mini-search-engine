@@ -8,6 +8,7 @@
             <div class="search-item bold">
                 <div class="search-select"><a href="javascript:void(0);" @click="delBantch">批量删除</a><input @click="selectAll" type="checkbox" v-model="m_select_all"></div>
                 <div class="search-item-name">标题</div>
+                <div class="search-time">收录时间</div>
                 <div>操作</div>
             </div>
             <div class="search-item" v-for="(k,i) in list" :key="k.id">
@@ -15,11 +16,14 @@
                 <div class="search-item-name">
                     <a :href="'http://'+k.host" target="_blank" v-html="filterKeyword(k.title)" rel="noopener"></a>
                 </div>
+                <div class="search-time">{{formatTime(new Date(k.create_time).getTime())}}</div>
                 <div>
                     <a href="javascript:void(0)" @click="del(k.id)">删除</a>
+                    <a href="javascript:void(0)" @click="update(k.id)">更新标题</a>
                 </div>
             </div>
         </div>
     </div>
     <pager :total="total" :page.sync="page" :page-size="20" @page-change="getList" layout="prev,pager,next,total" v-if="list.length"></pager>
+    <encoding-dlg :visible.sync="visible" @confirm="confirm"></encoding-dlg>
 </div>

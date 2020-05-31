@@ -8,6 +8,12 @@ module.exports = {
         login: './src/server/public/js/login.js',
         manager: './src/server/public/js/manager.js',
     },
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'src')
+        }
+    },
+    mode: 'production',
     optimization: {
         splitChunks: {
             chunks: 'all',

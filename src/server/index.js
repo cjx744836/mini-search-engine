@@ -18,10 +18,7 @@ app.use((req, res, next) => {
        let tk = Token.changeToken(req.cookies.token);
        tk && res.cookie('token', tk, {maxAge: 60 * 60 * 1000});
    }
-   if(Token.hadForceToken(req.cookies.token)) {
-       return res.status(500).send({code: 5000, err: '你的账户在其它地方登录'});
-   }
-   console.log(req.cookies.token);
+   if(Token.hadForceToken(req.cookies.token)) return res.status(500).send({code: 5000, err: '你的账户在其它地方登录'});
    next();
 });
 
@@ -72,18 +69,15 @@ app.post('/del', async (req, res) => {
 });
 
 app.post('/submit', async (req, res) => {
-   if(req.body.name && req.body.pwd) {
-       let data = await controller.getUser(req.body.name);
-       if(!data) return res.status(500).send({code: 1000, err: '用户不存在'});
-       if(Token.genPwd(req.body.pwd) !== data.pwd) return res.status(500).send({code: 1000, err: '密码错误'});
-       if(Token.hadUserName(req.body.name)) {
-           Token.updateByUserName(req.body.name);
-       }
-       res.cookie('token', Token.genToken(req.body.name), {maxAge: 60 * 60 * 1000});
-       res.send({code: 0});
-   } else {
-       res.status(500).send({code: 1000, err: '参数错误'});
+   if(!req.body.name || !req.body.pwd) res.status(500).send({code: 1000, err: '参数错误'});
+   let data = await controller.getUser(req.body.name);
+   if(!data) return res.status(500).send({code: 1000, err: '用户不存在'});
+   if(Token.genPwd(req.body.pwd) !== data.pwd) return res.status(500).send({code: 1000, err: '密码错误'});
+   if(Token.hadUserName(req.body.name)) {
+       Token.updateByUserName(req.body.name);
    }
+   res.cookie('token', Token.genToken(req.body.name), {maxAge: 60 * 60 * 1000});
+   res.send({code: 0});
 });
 
 app.post('/list', async (req, res) => {
@@ -98,6 +92,14 @@ app.post('/list', async (req, res) => {
     }
     if(!data) return res.status(500).send({code: 1001, err: '数据获取失败'});
     res.send({code: 0, total: data.total, list: data.list});
+});
+
+app.post('/update', async (req, res) => {
+    if(!Token.checkToken(req.cookies.token)) return res.status(500).send({code: 1001, err: '未登录'});
+    if(!req.body.encoding || !req.body.id) return res.status(500).send({code: 1000, err: '参数错误'});
+    let data = await controller.update(req.body.id, req.body.encoding);
+    if(!data) return res.status(500).send({code: 1001, err: '更新失败'});
+    res.send({code: 0, title: data.title});
 });
 
 app.get('*', (req, res) => {

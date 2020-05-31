@@ -1,4 +1,5 @@
-module.exports = function(url, method, param) {
+import message from '@/server/components/message';
+export default function(url, method, param) {
     return new Promise((resolve, reject) => {
         fetch(url, {
             method: method,
@@ -10,7 +11,7 @@ module.exports = function(url, method, param) {
         }).then(res => {
             res.json().then(data => {
                 if(res.status === 500) {
-                    reject({message: data.err, code: data.code});
+                    message(data.err);
                 }
                 if(res.status === 200) {
                     resolve(data);

@@ -1,4 +1,5 @@
 const query = require('./sql');
+const request = require('./request');
 
 async function search(key, start, size) {
     let sql = `select sql_calc_found_rows * from s_title where ${key} order by create_time desc limit ${start},${size}`;
@@ -46,10 +47,24 @@ async function del(id) {
     return true;
 }
 
+async function update(id, encoding) {
+    let sql = `select host from s_title where id = '${id}'`;
+    let data = await query(sql);
+    if(data.errCode) return false;
+    data = await request(data[0].host, encoding);
+    if(!data) return false;
+    let title = data;
+    sql = `update s_title set title = '${data}' where id = '${id}'`;
+    data = await query(sql);
+    if(data.errCode) return false;
+    return {title};
+}
+
 module.exports = {
     search,
     latest,
     getUser,
     list,
+    update,
     del
 };

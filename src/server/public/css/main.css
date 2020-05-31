@@ -80,6 +80,10 @@ html, body {
   width: 75px;
   flex-shrink: 0;
 }
+.search-list .search-item .search-time {
+  width: 180px;
+  flex-shrink: 0;
+}
 .search-list .search-item:hover {
   background: #eee;
 }
@@ -317,6 +321,16 @@ html, body {
   width: 30px;
   cursor: pointer;
   text-align: center;
+}
+
+.encoding-dlg {
+  background: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  border: 1px solid #b31f1f;
 }
 
 @media screen and (max-width: 375px) {
