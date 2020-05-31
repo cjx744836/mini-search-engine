@@ -4,17 +4,21 @@ const SF = ['cc', 'net', 'com', 'vip', 'wang', 'com.cn', 'cn', 'tv', 'org', 'top
 const CHAR = 'abcdefghijklmnopqrstuvwxyz0123456789';
 const LETTER = 'abcdefghijklmnopqrstuvwxyz';
 const Events = require('events');
-const WORDS = ['male', 'female', 'pig', 'rp', 'cb', 'fuck', 'chat', 'cow', 'cc', 'dd', 'dapao', 'cao', 'fun', 'funny', 'sq', 'qs', 'tk', 'rabbit', 'tigger', 'eat', 'tea', 'cj', 'kj', 'lili', 'loli', 'yz', 'fk', 'bg', 'bed', 'baby', 'vv', 'lv', 'ml', 'pic', 'mt', 'meitu', 'mntp', 'mn', 'mm', 'cat', 'god', 'dog', 'se', 'sex', 'sexy', 'girl', 'girls', 'beauty', 'like', 'love', 'pp', 'bb', 'sb', 'man', 'men'];
+const WORDS = ['male', 'female', 'pig', 'rp', 'cb', 'fuck', 'chat', 'cow', 'cc', 'dd', 'dapao', 'cao', 'fun', 'funny', 'sq', 'qs', 'tk', 'rabbit', 'tigger', 'eat', 'tea', 'cj', 'kj', 'lili', 'loli', 'yz', 'fk', 'bg', 'bed', 'baby', 'vv', 'lv', 'ml', 'pic', 'mt', 'meitu', 'mntp', 'mn', 'mm', 'cat', 'god', 'dog', 'se', 'sex', 'sexy', 'girl', 'girls', 'beauty', 'like', 'love', 'pp', 'bb', 'sb', 'man', 'men', 'oo', 'xx', 'xo', 'qq', 'aa', 'tt', 'll', 'pao', 'pipi', 'pi', 'vv', 'zz', 'uu', 'rr', 'ww', 'jj', 'gg', 'gm', 'lo', 'mb', 'hole', 'ass', 'ff', 'ee', 'yy', 'ai', 'av', 'porn', 'movie', 'film', 'blue', 'joke', 'eros', 'rose', 'food', 'fky', 'boy', 'book', 'cook', 'lust', 'gay', 'xxoo', 'ooxx', 'lsj', 'tb'];
 //%r: number + letter, %s: letter, %d: number, %c: character, %w: word
 const rules = [
         '%s:2',
         '%s:3',
+        '%s:4',
+        '%s:5',
         '%d:2',
         '%d:3',
         '%d:4',
         '%d:5',
         '%s:2%d:2',
+        '%d:2%s:2',
         '%s:3%d:3',
+        '%d:3%s:3',
         '%d:2%w:1',
         '%w:1%d:2',
         '%w:1%d:3',

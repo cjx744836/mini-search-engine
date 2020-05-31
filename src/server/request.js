@@ -50,24 +50,28 @@ function get(options) {
                     return reject(new Error(`Redirect Failed`));
                 }
             } else {
-                resId = setTimeout(() => {
-                    res.destroy();
-                    rawData = undefined;
-                    reject(new Error('Response Timeout'));
-                }, resTIMEOUT);
-                let m;
-                res.on('data', chunk => {
-                    rawData = Buffer.concat([rawData, chunk], rawData.length + chunk.length);
-                });
-                res.on('end', () => {
-                    clearTimeout(resId);
-                    resolve({data: rawData});
-                    rawData = undefined;
-                });
-                res.on('error', e => {
-                    if(res.destroyed) return;
-                    reject(e);
-                });
+                if(code === 200) {
+                    resId = setTimeout(() => {
+                        res.destroy();
+                        rawData = undefined;
+                        reject(new Error('Response Timeout'));
+                    }, resTIMEOUT);
+                    let m;
+                    res.on('data', chunk => {
+                        rawData = Buffer.concat([rawData, chunk], rawData.length + chunk.length);
+                    });
+                    res.on('end', () => {
+                        clearTimeout(resId);
+                        resolve({data: rawData});
+                        rawData = undefined;
+                    });
+                    res.on('error', e => {
+                        if(res.destroyed) return;
+                        reject(e);
+                    });
+                } else {
+                    reject(new Error(`Not Found`));
+                }
             }
         });
         tid = setTimeout(() => {

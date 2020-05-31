@@ -51,24 +51,28 @@ function get(options) {
                     return reject(new Error(`Redirect Failed`));
                 }
             } else {
-                resId = setTimeout(() => {
-                    res.destroy();
-                    rawData = undefined;
-                    reject(new Error('Response Timeout'));
-                }, resTIMEOUT);
-                let m;
-                res.on('data', chunk => {
-                    rawData = Buffer.concat([rawData, chunk], rawData.length + chunk.length);
-                });
-                res.on('end', () => {
-                    clearTimeout(resId);
-                    resolve({data: rawData});
-                    rawData = undefined;
-                });
-                res.on('error', e => {
-                    if(res.destroyed) return;
-                    reject(e);
-                });
+                if(code === 200) {
+                    resId = setTimeout(() => {
+                        res.destroy();
+                        rawData = undefined;
+                        reject(new Error('Response Timeout'));
+                    }, resTIMEOUT);
+                    let m;
+                    res.on('data', chunk => {
+                        rawData = Buffer.concat([rawData, chunk], rawData.length + chunk.length);
+                    });
+                    res.on('end', () => {
+                        clearTimeout(resId);
+                        resolve({data: rawData});
+                        rawData = undefined;
+                    });
+                    res.on('error', e => {
+                        if(res.destroyed) return;
+                        reject(e);
+                    });
+                } else {
+                    reject(new Error(`Not Found`));
+                }
             }
         });
         tid = setTimeout(() => {
@@ -96,6 +100,8 @@ function decode(t) {
     })
 }
 
+const filterKey = ['出售', '售卖', '来源', '电话', '没有找到', '米表', '私人小站', '域名', '欢迎访问', '欢迎光临', '彩票', '六合彩', '欢迎莅临', '新网', '网贷', '中介', '机构', '敬请期待', 'app', '无法访问', '无法找到', '体彩', '福彩', '商标', '网站已开通', '抱歉', '错误', '报错', '页面不存在', '出错'];
+
 process.on('message', args => {
     if(!args.host) return;
     options.host = args.host;
@@ -107,6 +113,7 @@ process.on('message', args => {
             if(/&#[^;]+;/.test(title[1])) {
                 title[1] = decode(title[1]);
             }
+            if(!/[\u00ff-\uffff]{3}/.test(title[1]) || filterKey.some(d => title[1].indexOf(d) > -1)) return process({err: 1});
             ob.title = title[1];
             ob.id = genId(args.host);
             ob.host = args.host;
